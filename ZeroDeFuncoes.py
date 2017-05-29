@@ -87,24 +87,18 @@ class BisseccaoWindow(QtGui.QMdiSubWindow):
 
 		#	etiqueta 'Erro'
 		self.erroLabel = QtGui.QLabel("Erro <= ",self)
-		self.erroLabel.move(250,20)
+		self.erroLabel.move(300,20)
 		self.erroLabel.resize(150,25)
 
 		#	campo para entrar com o erro
 		self.campoErro = QtGui.QLineEdit(self)
-		self.campoErro.move(295,22)
+		self.campoErro.move(345,22)
 		self.campoErro.resize(50,25)
 
 		#	etiqueta 'iteracoes'
-		# self.iteracoesLabel = QtGui.QLabel("Numero de Iteracoes (k) = ",self)
-		# self.iteracoesLabel.move(50,70)
-		# self.iteracoesLabel.resize(150,25)
-
-		#	campo para entrar com o erro
-		# self.campoIteracoes = QtGui.QLineEdit(self)
-		# self.campoIteracoes.move(200,70)
-		# self.campoIteracoes.resize(50,25)
-		# self.campoIteracoes.setReadOnly(True)
+		self.iteracoesLabel = QtGui.QLabel("Numero de Iteracoes (k) = ?",self)
+		self.iteracoesLabel.move(300,70)
+		self.iteracoesLabel.resize(155,25)
 
 		#	etiqueta ' intervalo'
 		self.intervaloLabel = QtGui.QLabel("Intervalo: (                   ,                  )",self)
@@ -119,8 +113,24 @@ class BisseccaoWindow(QtGui.QMdiSubWindow):
 		self.campoB.move(180,75)
 		self.campoB.resize(45,20)
 
+
+		#botao 'go!'
+		self.goBtn = QtGui.QPushButton("Go!", self)
+		self.goBtn.move(50,110)
+		self.goBtn.resize(410,25)
+		self.goBtn.clicked.connect(self.rodaMetodoBisseccao)
+
 		self.show()
 
+	def rodaMetodoBisseccao(self):
+		funcao = self.funcao.text()
+		print(funcao)
+
+	def calculaK(self):
+		pass
+
+	def verificaSinais(self):
+		pass
 
 
 
