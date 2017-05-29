@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import matplotlib.pyplot as plt
 import numpy as np
+import math
 import sys 								#não deixar de importar para usar graficos
 from PyQt4 import QtGui, QtCore			#não deixar de importar para usar graficos
 
@@ -80,10 +81,16 @@ class BisseccaoWindow(QtGui.QMdiSubWindow):
 		self.fDeX = QtGui.QLabel("f(x) = ",self)
 		self.fDeX.move(50,20)
 
+		#etiqueta da resposta
+		self.resposta = QtGui.QLabel("Resposta ---> ?",self)
+		self.resposta.move(50, 145)
+		self.resposta.resize(600, 50)
+		self.resposta.setFont(QtGui.QFont("Ubuntu", 12, QtGui.QFont.Bold))
+
 		#	campo para entrar com a função
-		self.funcao = QtGui.QLineEdit(self)
-		self.funcao.move(80,22)
-		self.funcao.resize(150,25)
+		self.campoFuncao = QtGui.QLineEdit(self)
+		self.campoFuncao.move(80,22)
+		self.campoFuncao.resize(150,25)
 
 		#	etiqueta 'Erro'
 		self.erroLabel = QtGui.QLabel("Erro <= ",self)
@@ -98,7 +105,7 @@ class BisseccaoWindow(QtGui.QMdiSubWindow):
 		#	etiqueta 'iteracoes'
 		self.iteracoesLabel = QtGui.QLabel("Numero de Iteracoes (k) = ?",self)
 		self.iteracoesLabel.move(300,70)
-		self.iteracoesLabel.resize(155,25)
+		self.iteracoesLabel.resize(165,25)
 
 		#	etiqueta ' intervalo'
 		self.intervaloLabel = QtGui.QLabel("Intervalo: (                   ,                  )",self)
@@ -118,19 +125,72 @@ class BisseccaoWindow(QtGui.QMdiSubWindow):
 		self.goBtn = QtGui.QPushButton("Go!", self)
 		self.goBtn.move(50,110)
 		self.goBtn.resize(410,25)
-		self.goBtn.clicked.connect(self.rodaMetodoBisseccao)
+		self.goBtn.clicked.connect(self.Starter)
 
 		self.show()
 
-	def rodaMetodoBisseccao(self):
-		funcao = self.funcao.text()
-		print(funcao)
+	def Starter(self):
+		#pega funcao digitada pelo usuario
+		self.funcao = self.campoFuncao.text()
 
-	def calculaK(self):
-		pass
+		#pega a e b do intervalo digitado
+		self.a = float(self.campoA.text())
+		self.b = float(self.campoB.text())
 
-	def verificaSinais(self):
-		pass
+		#pega o erro desejado
+		self.error = float(eval(str(self.campoErro.text())))
+		#calcula o numero de iterações necessária para aquele erro
+		self.k = self.CalculaK(self.a, self.b, self.error)
+		#atualiza a etiqueta na tela
+		self.iteracoesLabel.setText("Numero de Iteracoes (k) = %d" %self.k)
+
+		#executa o metodo
+		self.bissecao(self.a, self.b)
+
+	
+	def CalculaK(self, a, b, erro):
+		#pega sempre o valo positivo do intervalo
+		if(b-a >= 0):
+			h = b-a
+		if(b-a < 0):
+			h = (b-a)*-1
+		#retorna o valor de K arredondado pra cima
+		return math.ceil((np.log10(h/erro))/(np.log10(2)))
+
+	#calcula f(x)
+	def CalculaF(self, x):
+		return float(eval(str(self.funcao)))
+
+	#verifica sinais
+	def VerificaSinais(self, a, b):
+		if(self.CalculaF(a)*self.CalculaF(b) < 0):
+			return 1
+		else:
+			return 0
+
+	def bissecao(self, a, b):
+		condicao = self.VerificaSinais(a,b)
+		if(condicao == 0):
+			msg = QtGui.QMessageBox()
+			msg.setIcon(QtGui.QMessageBox.Information)
+			msg.setWindowTitle("Escolha de intervalo")
+			msg.setText("f(a) . f(b) > 0!")
+			msg.setInformativeText("Retorne e escolha outro intervalo de forma que f(a) . f(b) < 0")
+			msg.setDetailedText("f(a) = %f\nf(b) = %f\nf(a).f(b) = %f" %(self.CalculaF(a), self.CalculaF(b), self.CalculaF(a)*self.CalculaF(b)))
+			msg.setStandardButtons(QtGui.QMessageBox.Ok)
+			msg.exec_()
+		else:
+			for i in range(1, int(self.k)):
+				y0 = self.CalculaF(a)
+				y1 = self.CalculaF(b)
+				pMedio = (a+b)/2
+				yMedio = self.CalculaF(pMedio)
+				if(y0 * yMedio < 0):
+					b = pMedio
+				if(y1 * yMedio < 0):
+					a = pMedio
+		print(pMedio)
+		self.resposta.setText("Resposta ---> %.20f" %pMedio) 
 
 
 
