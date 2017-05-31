@@ -3,10 +3,16 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import math
+import parser
 import sys 								#não deixar de importar para usar graficos
 from PyQt4 import QtGui, QtCore			#não deixar de importar para usar graficos
 
-
+############
+import sympy
+from sympy import *
+from sympy.parsing.sympy_parser import parse_expr
+init_printing()
+############
 
 
 
@@ -160,7 +166,7 @@ class BisseccaoWindow(QtGui.QMdiSubWindow):
 	#calcula f(x)
 	def CalculaF(self, x):
 		return float(eval(str(self.funcao)))
-
+	
 	#verifica sinais
 	def VerificaSinais(self, a, b):
 		if(self.CalculaF(a)*self.CalculaF(b) < 0):
@@ -169,7 +175,24 @@ class BisseccaoWindow(QtGui.QMdiSubWindow):
 			return 0
 
 	def bissecao(self, a, b):
+
 		condicao = self.VerificaSinais(a,b)
+		#lista dos pontos medios para plotar
+		pMs = []
+		#essa lista é apenas pra plotagem
+		YpMs = []
+
+		aOrginal = a
+		bOrginal = b
+
+		#para plotagem
+		pMs.append(aOrginal)
+		pMs.append(bOrginal)
+		YpMs.append(0)
+		YpMs.append(0)
+
+
+		#se os sinais de f(a) e f(b) nao forem opostos, pede um novo intervalo
 		if(condicao == 0):
 			msg = QtGui.QMessageBox()
 			msg.setIcon(QtGui.QMessageBox.Information)
@@ -184,17 +207,28 @@ class BisseccaoWindow(QtGui.QMdiSubWindow):
 				y0 = self.CalculaF(a)
 				y1 = self.CalculaF(b)
 				pMedio = (a+b)/2
+				
+				#para plotagem
+				pMs.append(pMedio)
+				#para plotagem
+				YpMs.append(0)
+
 				yMedio = self.CalculaF(pMedio)
 				if(y0 * yMedio < 0):
 					b = pMedio
 				if(y1 * yMedio < 0):
 					a = pMedio
-		print(pMedio)
-		self.resposta.setText("Resposta ---> %.20f" %pMedio) 
+			self.resposta.setText("Resposta ---> %.20f" %pMedio)
+			
+			plt.axis([aOrginal-1,bOrginal+1,-5,10])
+			plt.plot(pMs,YpMs, 'bo')
+			plt.grid()
+			plt.show()
 
 
 
-
+	
+		
 
 
 
