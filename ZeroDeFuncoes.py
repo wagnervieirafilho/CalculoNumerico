@@ -17,8 +17,8 @@ init_printing()
 
 
 
-################################################################
 #classe da janela principal
+################################################################
 class Window(QtGui.QMainWindow):
 	#construtor
 	def __init__(self):
@@ -32,7 +32,7 @@ class Window(QtGui.QMainWindow):
 
 	def home(self):
 		#botao Bissecção
-		self.biBtn = QtGui.QPushButton("Bisseccao", self)
+		self.biBtn = QtGui.QPushButton("Bissecao", self)
 		self.biBtn.move(200,50)
 		self.biBtn.clicked.connect(self.criaJanelaDoMetodoBis)
 
@@ -68,8 +68,8 @@ class Window(QtGui.QMainWindow):
 
 
 
-#QMdiSubWindow
-#QMainWindow
+# classe que cria a janela do metodo da bisseccao
+######################################################################################
 class BisseccaoWindow(QtGui.QMdiSubWindow):
 	#construtor
 	
@@ -89,7 +89,7 @@ class BisseccaoWindow(QtGui.QMdiSubWindow):
 
 		#etiqueta da resposta
 		self.resposta = QtGui.QLabel("Resposta ---> ?",self)
-		self.resposta.move(50, 145)
+		self.resposta.move(50, 195)
 		self.resposta.resize(600, 50)
 		self.resposta.setFont(QtGui.QFont("Ubuntu", 12, QtGui.QFont.Bold))
 
@@ -133,6 +133,12 @@ class BisseccaoWindow(QtGui.QMdiSubWindow):
 		self.goBtn.resize(410,25)
 		self.goBtn.clicked.connect(self.Starter)
 
+		#botao 'plot!'
+		self.plotBtn = QtGui.QPushButton("Plot!", self)
+		self.plotBtn.move(50,145)
+		self.plotBtn.resize(410,25)
+		self.plotBtn.clicked.connect(self.Plotter)
+
 		self.show()
 
 	def Starter(self):
@@ -174,32 +180,44 @@ class BisseccaoWindow(QtGui.QMdiSubWindow):
 		else:
 			return 0
 
+	def Plotter(self):
+		def f(x):
+			return eval(str(self.funcao))
+
+		plt.axis([self.aOrginal-1,self.bOrginal+1,-100,100])
+		plt.plot(self.pMs,self.YpMs, 'bo', self.xs, f(self.xs),'k')
+		plt.grid()
+		plt.show()
+
 	def bissecao(self, a, b):
+		self.aOrginal = a
+		self.bOrginal = b
 
-		condicao = self.VerificaSinais(a,b)
+		
 		#lista dos pontos medios para plotar
-		pMs = []
+		self.pMs = []
 		#essa lista é apenas pra plotagem
-		YpMs = []
+		self.YpMs = []
 
-		aOrginal = a
-		bOrginal = b
+		#lista tambem para plotagem
+		self.xs = np.arange(float(self.aOrginal), float(self.bOrginal), 0.02)
 
 		#para plotagem
-		pMs.append(aOrginal)
-		pMs.append(bOrginal)
-		YpMs.append(0)
-		YpMs.append(0)
+		self.pMs.append(self.aOrginal)
+		self.pMs.append(self.bOrginal)
+		self.YpMs.append(0)
+		self.YpMs.append(0)
 
 
 		#se os sinais de f(a) e f(b) nao forem opostos, pede um novo intervalo
+		condicao = self.VerificaSinais(a,b)
 		if(condicao == 0):
 			msg = QtGui.QMessageBox()
 			msg.setIcon(QtGui.QMessageBox.Information)
 			msg.setWindowTitle("Escolha de intervalo")
 			msg.setText("f(a) . f(b) > 0!")
 			msg.setInformativeText("Retorne e escolha outro intervalo de forma que f(a) . f(b) < 0")
-			msg.setDetailedText("f(a) = %f\nf(b) = %f\nf(a).f(b) = %f" %(self.CalculaF(a), self.CalculaF(b), self.CalculaF(a)*self.CalculaF(b)))
+			msg.setDetailedText("Nao ha como garantir convergencia nesse intervalo!\nf(a) = %f\nf(b) = %f\nf(a).f(b) = %f" %(self.CalculaF(a), self.CalculaF(b), self.CalculaF(a)*self.CalculaF(b)))
 			msg.setStandardButtons(QtGui.QMessageBox.Ok)
 			msg.exec_()
 		else:
@@ -209,9 +227,9 @@ class BisseccaoWindow(QtGui.QMdiSubWindow):
 				pMedio = (a+b)/2
 				
 				#para plotagem
-				pMs.append(pMedio)
+				self.pMs.append(pMedio)
 				#para plotagem
-				YpMs.append(0)
+				self.YpMs.append(0)
 
 				yMedio = self.CalculaF(pMedio)
 				if(y0 * yMedio < 0):
@@ -219,11 +237,8 @@ class BisseccaoWindow(QtGui.QMdiSubWindow):
 				if(y1 * yMedio < 0):
 					a = pMedio
 			self.resposta.setText("Resposta ---> %.20f" %pMedio)
+
 			
-			plt.axis([aOrginal-1,bOrginal+1,-5,10])
-			plt.plot(pMs,YpMs, 'bo')
-			plt.grid()
-			plt.show()
 
 
 
