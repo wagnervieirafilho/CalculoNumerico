@@ -68,6 +68,26 @@ class Window(QtGui.QMainWindow):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # classe que cria a janela do metodo da bisseccao
 ######################################################################################
 class BisseccaoWindow(QtGui.QMdiSubWindow):
@@ -76,22 +96,22 @@ class BisseccaoWindow(QtGui.QMdiSubWindow):
 	def __init__(self):
 		super(BisseccaoWindow, self).__init__()
 		self.setGeometry(400,200,500,300)
-		self.setWindowTitle("Metodos da Bisseccao")
+		self.setWindowTitle("Metodo da Bisseccao")
 		self.setWindowIcon(QtGui.QIcon('ico.png'))
 		
 		#define o layout da janela do método da bissecao
 		self.define_layout()
 
 	def define_layout(self):
-		#	etiqueta 'F(x)'
-		self.fDeX = QtGui.QLabel("f(x) = ",self)
-		self.fDeX.move(50,20)
-
 		#etiqueta da resposta
 		self.resposta = QtGui.QLabel("Resposta ---> ?",self)
 		self.resposta.move(50, 195)
 		self.resposta.resize(600, 50)
 		self.resposta.setFont(QtGui.QFont("Ubuntu", 12, QtGui.QFont.Bold))
+
+		#	etiqueta 'F(x)'
+		self.fDeX = QtGui.QLabel("f(x) = ",self)
+		self.fDeX.move(50,20)
 
 		#	campo para entrar com a função
 		self.campoFuncao = QtGui.QLineEdit(self)
@@ -169,9 +189,11 @@ class BisseccaoWindow(QtGui.QMdiSubWindow):
 		#retorna o valor de K arredondado pra cima
 		return math.ceil((np.log10(h/erro))/(np.log10(2)))
 
+	
 	#calcula f(x)
 	def CalculaF(self, x):
 		return float(eval(str(self.funcao)))
+	
 	
 	#verifica sinais
 	def VerificaSinais(self, a, b):
@@ -180,6 +202,7 @@ class BisseccaoWindow(QtGui.QMdiSubWindow):
 		else:
 			return 0
 
+	# plotta
 	def Plotter(self):
 		def f(x):
 			return eval(str(self.funcao))
@@ -189,6 +212,8 @@ class BisseccaoWindow(QtGui.QMdiSubWindow):
 		plt.grid()
 		plt.show()
 
+	
+	#executa o metodo em si
 	def bissecao(self, a, b):
 		self.aOrginal = a
 		self.bOrginal = b
@@ -238,7 +263,203 @@ class BisseccaoWindow(QtGui.QMdiSubWindow):
 					a = pMedio
 			self.resposta.setText("Resposta ---> %.20f" %pMedio)
 
-			
+########################################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#classe que cria janela do metodo do ponto fixo
+########################################################################################
+class PontoWindow(QtGui.QMdiSubWindow):
+	def __init__(self):
+		super(PontoWindow, self).__init__()
+		self.setGeometry(400,200,500,300)
+		self.setWindowTitle("Metodo do ponto fixo")
+		self.setWindowIcon(QtGui.QIcon('ico.png'))
+		
+		#define o layout da janela do método da bissecao
+		self.define_layout()
+
+	def define_layout(self):
+		#	etiqueta 'g(x)'
+		self.gDeX = QtGui.QLabel("g(x) = ",self)
+		self.gDeX.move(50,20)
+
+		#	campo para entrar com a função
+		self.campoFuncao = QtGui.QLineEdit(self)
+		self.campoFuncao.move(80,22)
+		self.campoFuncao.resize(150,25)
+
+
+		#	etiqueta 'chute'
+		self.chuteLabel = QtGui.QLabel("chute inicial (x0) = ",self)
+		self.chuteLabel.move(250,20)
+		self.chuteLabel.resize(150,25)
+
+		#	campo para entrar com o chute inicial
+		self.campoChute = QtGui.QLineEdit(self)
+		self.campoChute.move(355,22)
+		self.campoChute.resize(50,25)
+
+		#	etiqueta 'Erro'
+		self.erroLabel = QtGui.QLabel("Erro maximo = ",self)
+		self.erroLabel.move(50,50)
+		self.erroLabel.resize(150,25)
+
+		#	campo para entrar com o erro
+		self.campoErro = QtGui.QLineEdit(self)
+		self.campoErro.move(135,52)
+		self.campoErro.resize(95,25)
+
+		#	etiqueta 'iteracoes'
+		self.iteracoesLabel = QtGui.QLabel("Numero de Iteracoes (k) = ?",self)
+		self.iteracoesLabel.move(250,52)
+		self.iteracoesLabel.resize(165,25)
+
+
+		#botao 'go!'
+		self.goBtn = QtGui.QPushButton("Go!", self)
+		self.goBtn.move(50,110)
+		self.goBtn.resize(410,25)
+		#self.goBtn.clicked.connect(self.Starter)
+
+		#botao 'plot!'
+		self.plotBtn = QtGui.QPushButton("Plot!", self)
+		self.plotBtn.move(50,145)
+		self.plotBtn.resize(410,25)
+		#self.plotBtn.clicked.connect(self.Plotter)
+
+		#etiqueta da resposta
+		self.resposta = QtGui.QLabel("Resposta ---> ?",self)
+		self.resposta.move(50, 195)
+		self.resposta.resize(600, 50)
+		self.resposta.setFont(QtGui.QFont("Ubuntu", 12, QtGui.QFont.Bold))
+
+		self.show()
+
+
+
+
+
+
+
+
+
+
+########################################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#classe que cria a janela do método de newton
+########################################################################################
+class NewtonWindow(QtGui.QMdiSubWindow):
+	def __init__(self):
+		super(NewtonWindow, self).__init__()
+		self.setGeometry(400,200,500,300)
+		self.setWindowTitle("Metodo de Newton")
+		self.setWindowIcon(QtGui.QIcon('ico.png'))
+		
+		#define o layout da janela do método da bissecao
+		self.define_layout()
+
+	def define_layout(self):
+		#	etiqueta 'g(x)'
+		self.gDeX = QtGui.QLabel("g(x) = ",self)
+		self.gDeX.move(50,20)
+
+		#	campo para entrar com a função
+		self.campoFuncao = QtGui.QLineEdit(self)
+		self.campoFuncao.move(80,22)
+		self.campoFuncao.resize(150,25)
+
+
+		#	etiqueta 'chute'
+		self.chuteLabel = QtGui.QLabel("chute inicial (x0) = ",self)
+		self.chuteLabel.move(250,20)
+		self.chuteLabel.resize(150,25)
+
+		#	campo para entrar com o chute inicial
+		self.campoChute = QtGui.QLineEdit(self)
+		self.campoChute.move(355,22)
+		self.campoChute.resize(50,25)
+
+		#	etiqueta 'Erro'
+		self.erroLabel = QtGui.QLabel("Erro maximo = ",self)
+		self.erroLabel.move(50,50)
+		self.erroLabel.resize(150,25)
+
+		#	campo para entrar com o erro
+		self.campoErro = QtGui.QLineEdit(self)
+		self.campoErro.move(135,52)
+		self.campoErro.resize(95,25)
+
+		#	etiqueta 'iteracoes'
+		self.iteracoesLabel = QtGui.QLabel("Numero de Iteracoes (k) = ?",self)
+		self.iteracoesLabel.move(250,52)
+		self.iteracoesLabel.resize(165,25)
+
+
+		#botao 'go!'
+		self.goBtn = QtGui.QPushButton("Go!", self)
+		self.goBtn.move(50,110)
+		self.goBtn.resize(410,25)
+		#self.goBtn.clicked.connect(self.Starter)
+
+		#botao 'plot!'
+		self.plotBtn = QtGui.QPushButton("Plot!", self)
+		self.plotBtn.move(50,145)
+		self.plotBtn.resize(410,25)
+		#self.plotBtn.clicked.connect(self.Plotter)
+
+		#etiqueta da resposta
+		self.resposta = QtGui.QLabel("Resposta ---> ?",self)
+		self.resposta.move(50, 195)
+		self.resposta.resize(600, 50)
+		self.resposta.setFont(QtGui.QFont("Ubuntu", 12, QtGui.QFont.Bold))
+
+		self.show()
+
 
 
 
