@@ -109,6 +109,12 @@ class BisseccaoWindow(QtGui.QMdiSubWindow):
 		self.resposta.resize(600, 50)
 		self.resposta.setFont(QtGui.QFont("Ubuntu", 12, QtGui.QFont.Bold))
 
+		#etiqueta de obs
+		self.obs = QtGui.QLabel("Obs.: Escreva 'np.exp(x)' ao inves de 'exp(x)'\nEscreva 'np.log(x)' ao inves de 'ln(x)'\n'np.log10(x) --> log(x) na base 10'",self)
+		self.obs.move(250, 200)
+		self.obs.resize(600, 100)
+		self.obs.setFont(QtGui.QFont("Ubuntu", 7, QtGui.QFont.Bold))
+
 		#	etiqueta 'F(x)'
 		self.fDeX = QtGui.QLabel("f(x) = ",self)
 		self.fDeX.move(50,20)
