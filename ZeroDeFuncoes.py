@@ -614,16 +614,25 @@ class NewtonWindow(QtGui.QMdiSubWindow):
 			#retorna a expressao digitada pelo usuário
 			return a
 		
+		#plota a função principal
 		p1 = plot(f(x), show = False)
 
+		#acha as equações das retas tangentes aos pontos
 		for i in range(0, len(self.derivadas)):
+
+			#acha o coeficiente independente
 			b = -(self.derivadas[i]*self.xk1[i+1])
 
 			
 			#p2 = plot(self.derivadas[i]*x+b, show=False)
+
+			# aqui vai adicionando ao plot as retas tangentes no intervalo. elas são plotadas no intervalo
+			# [xk , xk+1]
 			p2 = plot(self.derivadas[i]*x+b, (x, self.xk1[i], self.xk1[i+1]) ,show=False)
 
 			p1.append(p2[0])
+
+			#setta a cor das retas tangentes
 			p1[i+1].line_color = 'firebrick'
 
 		p1.show()
