@@ -207,7 +207,8 @@ class BisseccaoWindow(QtGui.QMdiSubWindow):
 		def f(x):
 			return eval(str(self.funcao))
 
-		plt.axis([self.aOrginal-1,self.bOrginal+1,-100,100])
+		#plt.axis([self.aOrginal-1,self.bOrginal+1,-100,100])
+		plt.axis([self.aOrginal-1,self.bOrginal+1,-20,20])
 		plt.plot(self.pMs,self.YpMs, 'bo', self.xs, f(self.xs),'k')
 		plt.grid()
 		plt.show()
@@ -250,17 +251,21 @@ class BisseccaoWindow(QtGui.QMdiSubWindow):
 				y0 = self.CalculaF(a)
 				y1 = self.CalculaF(b)
 				pMedio = (a+b)/2
+				print("%.20f" %pMedio)
 				
 				#para plotagem
 				self.pMs.append(pMedio)
 				#para plotagem
 				self.YpMs.append(0)
 
+				#executa o método da biss
 				yMedio = self.CalculaF(pMedio)
 				if(y0 * yMedio < 0):
 					b = pMedio
+					print("%.20f" %pMedio)
 				if(y1 * yMedio < 0):
 					a = pMedio
+					print("%.20f" %pMedio)
 			self.resposta.setText("Resposta ---> %.20f" %pMedio)
 
 ########################################################################################
@@ -321,15 +326,15 @@ class PontoWindow(QtGui.QMdiSubWindow):
 		self.campoChute.move(355,22)
 		self.campoChute.resize(50,25)
 
-		#	etiqueta 'Erro'
-		self.erroLabel = QtGui.QLabel("Erro maximo = ",self)
+		#	etiqueta 'Criterio de parada'
+		self.erroLabel = QtGui.QLabel("Criterio de parada =\n  |x(k) - x(k+1) < ?| ",self)
 		self.erroLabel.move(50,50)
-		self.erroLabel.resize(150,25)
+		self.erroLabel.resize(150,55)
 
-		#	campo para entrar com o erro
-		self.campoErro = QtGui.QLineEdit(self)
-		self.campoErro.move(135,52)
-		self.campoErro.resize(95,25)
+		#	campo para entrar com o criterio de parada
+		self.campoCriterio = QtGui.QLineEdit(self)
+		self.campoCriterio.move(165,52)
+		self.campoCriterio.resize(65,25)
 
 		#	etiqueta 'iteracoes'
 		self.iteracoesLabel = QtGui.QLabel("Numero de Iteracoes (k) = ?",self)
@@ -341,13 +346,13 @@ class PontoWindow(QtGui.QMdiSubWindow):
 		self.goBtn = QtGui.QPushButton("Go!", self)
 		self.goBtn.move(50,110)
 		self.goBtn.resize(410,25)
-		#self.goBtn.clicked.connect(self.Starter)
+		self.goBtn.clicked.connect(self.Starter)
 
 		#botao 'plot!'
 		self.plotBtn = QtGui.QPushButton("Plot!", self)
 		self.plotBtn.move(50,145)
 		self.plotBtn.resize(410,25)
-		#self.plotBtn.clicked.connect(self.Plotter)
+		self.plotBtn.clicked.connect(self.Plotter)
 
 		#etiqueta da resposta
 		self.resposta = QtGui.QLabel("Resposta ---> ?",self)
@@ -356,6 +361,70 @@ class PontoWindow(QtGui.QMdiSubWindow):
 		self.resposta.setFont(QtGui.QFont("Ubuntu", 12, QtGui.QFont.Bold))
 
 		self.show()
+
+	def Starter(self):
+		iteracoes = 0
+		chuteInicial = float(self.campoChute.text())
+		criterio = float(eval(str(self.campoCriterio.text())))
+
+		#define x e y como simbolos
+		x, y = symbols('x y')
+		
+		#define a função f(x) para o sympy
+		def f(x):
+			#pega a expressao digitada pelo usuário
+			expr = str("'" + self.campoFuncao.text() + "'")
+
+			#faz o parse da expressao
+			a = parse_expr(expr)
+
+			#retorna a expressao digitada pelo usuário
+			return a
+
+		#primeira iteração do método do ponto fixo
+		xK = chuteInicial
+
+		#essa linha ficou meio gambiarra. Pra calcular o valor de f(x) fiz a derivada da integral de f(x),
+		# só por que tava dando problema na conversao dos tipos da expressao. Como to sem tempo, foi na base
+		#da gambiarra mesmo.
+		xkMais1 = (diff(integrate(f(x),x),x).subs(x,xK))
+
+		#incrementa o numero de iterações
+		iteracoes += 1
+
+		print("%.20f" %xkMais1)
+
+		#realiza as iterações do método de newton até no máximo 10000 iterações
+		while((abs(xK - xkMais1) >= criterio) and (iteracoes < 10000)):
+			xK = xkMais1
+			xkMais1 = (diff(integrate(f(x),x),x).subs(x,xK))
+			iteracoes += 1
+			print("%.20f" %xkMais1)
+
+		self.resposta.setText("Resposta ---> %.20f" %xkMais1)
+		self.iteracoesLabel.setText("Numero de Iteracoes (k) = %d" %iteracoes)
+
+
+
+	def Plotter(self):
+		#define x e y como simbolos
+		x, y = symbols('x y')
+		
+		#define a função f(x) para o sympy
+		def f(x):
+			#pega a expressao digitada pelo usuário
+			expr = str("'" + self.campoFuncao.text() + "'")
+
+			#faz o parse da expressao
+			a = parse_expr(expr)
+
+			#retorna a expressao digitada pelo usuário
+			return a
+		p1 = plot(f(x),x, show = False)
+		p1[1].line_color = 'firebrick'
+		p1.show()
+
+	
 
 
 
@@ -404,8 +473,8 @@ class NewtonWindow(QtGui.QMdiSubWindow):
 		self.define_layout()
 
 	def define_layout(self):
-		#	etiqueta 'g(x)'
-		self.gDeX = QtGui.QLabel("g(x) = ",self)
+		#	etiqueta 'f(x)'
+		self.gDeX = QtGui.QLabel("f(x) = ",self)
 		self.gDeX.move(50,20)
 
 		#	campo para entrar com a função
@@ -424,15 +493,15 @@ class NewtonWindow(QtGui.QMdiSubWindow):
 		self.campoChute.move(355,22)
 		self.campoChute.resize(50,25)
 
-		#	etiqueta 'Erro'
-		self.erroLabel = QtGui.QLabel("Erro maximo = ",self)
+		#	etiqueta 'Criterio de parada'
+		self.erroLabel = QtGui.QLabel("Criterio de parada =\n  |x(k) - x(k+1) < ?| ",self)
 		self.erroLabel.move(50,50)
-		self.erroLabel.resize(150,25)
+		self.erroLabel.resize(150,55)
 
-		#	campo para entrar com o erro
-		self.campoErro = QtGui.QLineEdit(self)
-		self.campoErro.move(135,52)
-		self.campoErro.resize(95,25)
+		#	campo para entrar com o criterio de parada
+		self.campoCriterio = QtGui.QLineEdit(self)
+		self.campoCriterio.move(165,52)
+		self.campoCriterio.resize(65,25)
 
 		#	etiqueta 'iteracoes'
 		self.iteracoesLabel = QtGui.QLabel("Numero de Iteracoes (k) = ?",self)
@@ -444,13 +513,13 @@ class NewtonWindow(QtGui.QMdiSubWindow):
 		self.goBtn = QtGui.QPushButton("Go!", self)
 		self.goBtn.move(50,110)
 		self.goBtn.resize(410,25)
-		#self.goBtn.clicked.connect(self.Starter)
+		self.goBtn.clicked.connect(self.Starter)
 
 		#botao 'plot!'
 		self.plotBtn = QtGui.QPushButton("Plot!", self)
 		self.plotBtn.move(50,145)
 		self.plotBtn.resize(410,25)
-		#self.plotBtn.clicked.connect(self.Plotter)
+		self.plotBtn.clicked.connect(self.Plotter)
 
 		#etiqueta da resposta
 		self.resposta = QtGui.QLabel("Resposta ---> ?",self)
@@ -460,11 +529,105 @@ class NewtonWindow(QtGui.QMdiSubWindow):
 
 		self.show()
 
+	def Starter(self):
 
+		#numero de iteracoes
+		iteracoes = 0
 
+		#lista de derivadas para plotagem
+		self.derivadas = []
 
-	
+		#lista de xkmais1 para plotagem
+		self.xk1 = []
+
+		#pega o valor do chute inicial
+		chuteInicial = float(self.campoChute.text())
+
+		#pega o valor da diferença do critério de parada
+		criterio = float(eval(str(self.campoCriterio.text())))
+
+		#define x e y como simbolos
+		x, y = symbols('x y')
 		
+		#define a função f(x) para o sympy
+		def f(x):
+			#pega a expressao digitada pelo usuário
+			expr = str("'" + self.campoFuncao.text() + "'")
+
+			#faz o parse da expressao
+			a = parse_expr(expr)
+
+			#retorna a expressao digitada pelo usuário
+			return a
+
+		#primeira iteração do método de newton
+		xK = chuteInicial
+		self.xk1.append(chuteInicial)
+		
+
+		#pega a derivada no ponto xk para plotagem
+		der = diff(f(x),x).subs(x,xK)
+		self.derivadas.append(der)
+
+		#essa linha ficou meio gambiarra. Pra calcular o valor de f(x) fiz a derivada da integral de f(x),
+		# só por que tava dando problema na conversao dos tipos da expressao. Como to sem tempo, foi na base
+		#da gambiarra mesmo.
+		xkMais1 = xK - ( diff(integrate(f(x),x),x).subs(x,xK) / diff(f(x),x).subs(x,xK))
+		self.xk1.append(xkMais1)
+
+		#incrementa o numero de iterações
+		iteracoes += 1
+
+		print("%.20f" %xkMais1)
+
+		#realiza as iterações do método de newton até no máximo 10000 iterações
+		while((abs(xK - xkMais1) >= criterio) and (iteracoes < 10000)):
+			
+			xK = xkMais1
+
+			#pega a derivada no ponto xk para plotagem
+			der = diff(f(x),x).subs(x,xK)
+			self.derivadas.append(der)
+
+			xkMais1 = xK - ( diff(integrate(f(x),x),x).subs(x,xK) / diff(f(x),x).subs(x,xK))
+			self.xk1.append(xkMais1)
+
+			iteracoes += 1
+
+			print("%.20f" %xkMais1)
+
+		self.resposta.setText("Resposta ---> %.20f" %xkMais1)
+		self.iteracoesLabel.setText("Numero de Iteracoes (k) = %d" %iteracoes)
+
+	def Plotter(self):
+		#define x e y como simbolos
+		x, y = symbols('x y')
+		
+		#define a função f(x) para o sympy
+		def f(x):
+			#pega a expressao digitada pelo usuário
+			expr = str("'" + self.campoFuncao.text() + "'")
+
+			#faz o parse da expressao
+			a = parse_expr(expr)
+
+			#retorna a expressao digitada pelo usuário
+			return a
+		
+		p1 = plot(f(x), show = False)
+
+		for i in range(0, len(self.derivadas)):
+			b = -(self.derivadas[i]*self.xk1[i+1])
+
+			
+			#p2 = plot(self.derivadas[i]*x+b, show=False)
+			p2 = plot(self.derivadas[i]*x+b, (x, self.xk1[i], self.xk1[i+1]) ,show=False)
+
+			p1.append(p2[0])
+			p1[i+1].line_color = 'firebrick'
+
+		p1.show()
+
 
 
 
@@ -478,3 +641,6 @@ def run():
 	sys.exit(app.exec_())
 
 run()
+
+
+
