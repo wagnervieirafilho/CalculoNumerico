@@ -25,7 +25,7 @@ class Window(QtGui.QMainWindow):
 		super(Window, self).__init__()
 		self.setGeometry(400,200,500,300)
 		self.setWindowTitle("Metodos iterativos")
-		self.setWindowIcon(QtGui.QIcon('ico.png'))
+		#self.setWindowIcon(QtGui.QIcon('ico.png'))
 		
 		#define o layout da janela principal
 		self.home()
@@ -97,7 +97,7 @@ class BisseccaoWindow(QtGui.QMdiSubWindow):
 		super(BisseccaoWindow, self).__init__()
 		self.setGeometry(400,200,500,300)
 		self.setWindowTitle("Metodo da Bisseccao")
-		self.setWindowIcon(QtGui.QIcon('ico.png'))
+		#self.setWindowIcon(QtGui.QIcon('ico.png'))
 		
 		#define o layout da janela do método da bissecao
 		self.define_layout()
@@ -306,7 +306,7 @@ class PontoWindow(QtGui.QMdiSubWindow):
 		super(PontoWindow, self).__init__()
 		self.setGeometry(400,200,500,300)
 		self.setWindowTitle("Metodo do ponto fixo")
-		self.setWindowIcon(QtGui.QIcon('ico.png'))
+		#self.setWindowIcon(QtGui.QIcon('ico.png'))
 		
 		#define o layout da janela do método da bissecao
 		self.define_layout()
@@ -401,13 +401,22 @@ class PontoWindow(QtGui.QMdiSubWindow):
 		print("%.20f" %xkMais1)
 
 		#realiza as iterações do método de newton até no máximo 10000 iterações
-		while((abs(xK - xkMais1) >= criterio) and (iteracoes < 10000)):
+		while((abs(xK - xkMais1) >= criterio) and (iteracoes <= 10000)):
 			xK = xkMais1
 			xkMais1 = (diff(integrate(f(x),x),x).subs(x,xK))
 			iteracoes += 1
 			print("%.20f" %xkMais1)
 
-		self.resposta.setText("Resposta ---> %.20f" %xkMais1)
+		if(iteracoes > 10000):
+			msg = QtGui.QMessageBox()
+			msg.setIcon(QtGui.QMessageBox.Information)
+			msg.setWindowTitle("Limite de iteracoes")
+			msg.setText("limite maximo de iteracoes atingido (10000 iteracoes)")
+			msg.setStandardButtons(QtGui.QMessageBox.Ok)
+			msg.exec_()
+		else:
+			self.resposta.setText("Resposta ---> %.20f" %xkMais1)
+			
 		self.iteracoesLabel.setText("Numero de Iteracoes (k) = %d" %iteracoes)
 
 
@@ -473,7 +482,7 @@ class NewtonWindow(QtGui.QMdiSubWindow):
 		super(NewtonWindow, self).__init__()
 		self.setGeometry(400,200,500,300)
 		self.setWindowTitle("Metodo de Newton")
-		self.setWindowIcon(QtGui.QIcon('ico.png'))
+		#self.setWindowIcon(QtGui.QIcon('ico.png'))
 		
 		#define o layout da janela do método da bissecao
 		self.define_layout()
@@ -587,8 +596,8 @@ class NewtonWindow(QtGui.QMdiSubWindow):
 		print("%.20f" %xkMais1)
 
 		#realiza as iterações do método de newton até no máximo 10000 iterações
-		while((abs(xK - xkMais1) >= criterio) and (iteracoes < 10000)):
-			
+		while((abs(xK - xkMais1) >= criterio) and (iteracoes <= 10000)):
+		
 			xK = xkMais1
 
 			#pega a derivada no ponto xk para plotagem
@@ -602,7 +611,16 @@ class NewtonWindow(QtGui.QMdiSubWindow):
 
 			print("%.20f" %xkMais1)
 
-		self.resposta.setText("Resposta ---> %.20f" %xkMais1)
+		if(iteracoes > 10000):
+			msg = QtGui.QMessageBox()
+			msg.setIcon(QtGui.QMessageBox.Information)
+			msg.setWindowTitle("Limite de iteracoes")
+			msg.setText("limite maximo de iteracoes atingido (10000 iteracoes)")
+			msg.setStandardButtons(QtGui.QMessageBox.Ok)
+			msg.exec_()
+		else:
+			self.resposta.setText("Resposta ---> %.20f" %xkMais1)
+		
 		self.iteracoesLabel.setText("Numero de Iteracoes (k) = %d" %iteracoes)
 
 	def Plotter(self):
